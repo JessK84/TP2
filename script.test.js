@@ -43,16 +43,18 @@ const precios = [
 const precioMaquina = componentes => { 
     let resultado = 0;
     let sumaComponentes = 0;
+
     for(let i = 0; i < componentes.length; i++){
-        if(componentes[i] === String) undefined;
+        if(componentes[i] === Number) throw new Error ("El componente no existe.");
         resultado = precios.find(componente => componente[0] === componentes[i]);
-        if(!resultado) throw new Error ("El componente no existe.");
-        
+        if(!resultado) throw new Error ("El componente no existe.");      
         sumaComponentes += resultado[1];
     }
     return sumaComponentes
 }
 
+
+///////////////////////// test/////////
 describe('PrecioMaquina: testea sumar el precio de los componentes y obtener el valor de cada máquina', () => { 
   test("Probando si funciona obtener precio al ingresar un array de 3 componentes", () => {
     expect(precioMaquina(['Monitor ASC 543' , 'Motherboard ASUS 1200' , 'RAM Quinston'] )).toBe(460);
@@ -81,7 +83,7 @@ describe('PrecioMaquina: testeo de errores', () => {
     const fn = () => precioMaquina('Monitor ASC 543 Motherboard ASUS 1200');
     expect(fn).toThrow("El componente no existe.");
   });
-  test("Arroja mensaje 'TypeError' si el parámetro se pasa como vacío", () => {
+  test("Arroja mensaje 'TypeError' si el parámetro se pasa vacío", () => {
     const fn = () => precioMaquina();
     expect(fn).toThrow(TypeError);
   });
@@ -136,11 +138,7 @@ const ventasVendedora = nombre => {
 describe('ventasVendedora: devuelve el importe total de ventas de una vendedora', () => { 
   test("Devuelve el importe de la cantidad de ventas que tuvo esa vendedora", () => {
     expect(ventasVendedora('Grace')).toBe(990);
-  });
-  test("Devuelve el importe de la cantidad de ventas que tuvo esa vendedora", () => {
     expect(ventasVendedora('Ada')).toBe(670);
-  });
-  test("Devuelve el importe de la cantidad de ventas que tuvo esa vendedora", () => {
     expect(ventasVendedora('Hedy')).toBe(460);
   });
   test("Devuelve 0 si la vendedora no vendió nada", () => {
@@ -166,35 +164,59 @@ const componenteMasVendido = () => {
   let componenteDeMasVentas ="";
   precios.forEach(componente => {
     let numero = cantidadVentasComponente(componente[0]);
-    if(mayor < numero) {
+    if(mayor <= numero) {
       mayor = numero;
-      componenteDeMasVentas = componente[0];
+      mayor += componente[0];
+      componenteDeMasVentas = mayor;
     }
-});
+  });
   return componenteDeMasVentas
 }
 
-// 5. ventasSucursal(sucursal) : recibe por parámetro el nombre de una sucursal y
+// describe('componenteMasVendido: devuelve nombre del componente más vendido', () => { 
+//   test("Devuelve un string como el nombre de un componente", () => {
+//     expect(componenteMasVendido()).toBe("Monitor GPRS 3000");
+//   });
+//   // test("Devuelve 0 si el parámetro se ingresa vacío", () => {
+//   //   expect(ventasVendedora()).toBe(0);
+//   // });
+// });
+
+
+// 5. ventasSucursal(sucursal): recibe por parámetro el nombre de una sucursal y
 // retorna el importe de las ventas totales realizadas por una sucursal sin límite de
 // fecha.
 const ventasSucursal = (sucursal) => {
   const filtrarPorSucursal = ventas.filter(venta => venta.includes(sucursal));
-  console.log(filtrarPorSucursal)
+  // console.log(filtrarPorSucursal)
 
   let porSucursal = [];
     
   for (let i = 0;  i < filtrarPorSucursal.length; i++) {
       let obtenerComponentes = filtrarPorSucursal[i].splice(6);
-      console.log(obtenerComponentes)
+      // console.log(obtenerComponentes)
       porSucursal.push(obtenerComponentes.flat());  
    }
    return precioMaquina(porSucursal.flat());
 } // el parámetro de la función precioMaquina toma un array 1D, el flat() perite hacer un array único para calcular el precio por total. 
 
+describe('ventasSucursal: devuelve el total de ventas de la sucursal', () => { 
+  test("Devuelve un número, el restulado de ventas de esa sucursal", () => {
+    expect(ventasSucursal('Centro')).toBe(990);
+    expect(ventasSucursal('Caballito')).toBe(1130);
+  });
+  test("Devuelve cero(0) si la sucursal no existe", () => {
+    expect(ventasSucursal('Sur')).toBe(0);
+  });
+  test("Devuelve cero(0) si el nombre de la sucursal se ingresa como array", () => {
+    expect(ventasSucursal(['Centro'])).toBe(0);
+  });
+});
+
 // 6. mejorVendedora() : Devuelve el nombre de la vendedora que más ingresos generó
 const mejorVendedora = () => {
 
-  let nombreDeVendedora = "";
+  let nombreDeVendedora;
   let mayor = 0;
   for (let i = 0; i < vendedoras.length; i++) {
     if(mayor < ventasVendedora(vendedoras[i])) {
@@ -204,6 +226,13 @@ const mejorVendedora = () => {
   }
     return nombreDeVendedora
 }
+
+describe('mejorVendedora: devuelve el nombre de la vendedora que más ingresos generó',() =>{ 
+  test("Devuelve el nombre de la vendedora que más ventas generó", () => {
+    expect(mejorVendedora(vendedoras)).toBe('Grace');
+  });
+});
+
   
 // 7. ventaPromedio() : Debe retornar el importe promedio por venta, como un número
 // entero sin decimales redondeado siempre para abajo.
@@ -212,23 +241,42 @@ const ventaPromedio = () => {
 
   for (let i = 0;  i < ventas.length; i++) {
     let obtenerComponentes = ventas[i].slice(6);
-    console.log(obtenerComponentes)
     porComponentes.push(obtenerComponentes.flat()); 
    } 
+   
    const ventasTotales = precioMaquina(porComponentes.flat()) / ventas.length;
    return Math.round(ventasTotales)
 } 
 
+describe('ventaPromedio: devuelve el importe promedio por venta',() =>{ 
+
+  test("Devuelve un numero con promedio de venta", () => {
+    expect(ventaPromedio()).toBe(353);
+  });
+});
+
 // 8. obtenerIdVenta() : Tiene que retornar un número aleatorio entre 100000000 y
 // 999999999
 const obtenerIdVenta = () => {
-  let maximo = 999999999;
-  let minimo = 100000000;
+  const maximo = 999999999;
+  const minimo = 100000000;
   let idAleatorio = Math.random() * (maximo - minimo) + minimo;
     
   return Math.round(idAleatorio);
 }
 
+describe('obtenerIdVenta: devuelve un nuevo aleatorio entre 999999999 y 100000000', () => { 
+  test("Probando obtener un número aleatorio mayor que 100000000", () => {
+    const maximo = 999999999;
+    const minimo = 100000000;
+    expect(obtenerIdVenta(Math.round(maximo, minimo))).toBeGreaterThan(100000000)
+  });
+  test("Probando obtener un número aleatorio menos que 999999999", () => {
+    const maximo = 999999999;
+    const minimo = 100000000;
+    expect(obtenerIdVenta(Math.round(maximo, minimo))).toBeLessThanOrEqual(999999999)
+  });
+});
 // 9. agregarVenta(dia, mes, anio, vendedora, sucursal, componentes) : recibe por
 // parámetro todos los datos de una venta, y los agrega en el array de ventas. Al igual
 // que las ventas que ya están previamente creadas, además de estos datos
@@ -243,3 +291,10 @@ const agregarVenta = (dia, mes, anio, vendedora, sucursal, componentes) => {
 
   return nuevaVenta
 }
+
+// describe('agregarVenta: devuelve un nuevo array con una nueva venta', () => { 
+//   test("Probando agregar una nueva venta", () => {
+
+//     expect(agregarVenta(6, 10, 2019, 'Grace', 'Centro', ['Monitor ASC 543' , 'Motherboard ASUS 1200' , 'RAM Quinston' ]).toBe(6, 10, 2019, 'Grace', 'Centro', ['Monitor ASC 543' , 'Motherboard ASUS 1200', 'RAM Quinston']))
+//   });
+// });

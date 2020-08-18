@@ -34,18 +34,102 @@ const precios = [
   [ 'RAM Quinston' , 110 ],
   [ 'RAM Quinston Fury' , 230 ]
 ];
+
+
 const precioMaquina = componentes => { 
-    let resultado = 0;
-    let sumaComponentes = 0;
-    for(let i = 0; i < componentes.length; i++){
-        resultado = precios.find(componente => componente[0] === componentes[i]);
-        console.log(resultado)
-        if (!resultado) throw new Error ("El componente no existe.");
-        // if(componente[0] === componentes[0]) throw new Error ("El existe.")
-        sumaComponentes += resultado[1];
-    }
-    return sumaComponentes
+  let resultado = 0;
+  let sumaComponentes = 0;
+
+  for(let i = 0; i < componentes.length; i++){
+      if(componentes[i] === Number) throw new Error ("El componente no existe.");
+      resultado = precios.find(componente => componente[0] === componentes[i]);
+      if(!resultado) throw new Error ("El componente no existe.");      
+      sumaComponentes += resultado[1];
+  }
+  return sumaComponentes
 }
+
+const mejorVendedora = () => {
+  let nombreDeVendedora = "";
+  let mayor = 0;
+  for (let i = 0; i < vendedoras.length; i++) {
+    if(mayor < ventasVendedora(vendedoras[i])) {
+       mayor = ventasVendedora(vendedoras[i]);
+       nombreDeVendedora = vendedoras[i];
+    }  
+  }
+    return nombreDeVendedora
+}
+
+const componenteMasVendido = () => {
+  let mayor = 0;
+  let nombreDelComponente = [];
+  for (let i = 0; i < ventas.length; i++) {
+    let venta = ventas[i].slice(6).flat()
+    nombreDelComponente.push(venta)  
+  }
+
+  nombreDelComponente.forEach(componente => {
+        let numero = cantidadVentasComponente(componente);
+        if(mayor <= numero) {
+          mayor = numero;
+          mayor += componente;
+          componenteDeMasVentas = componente;
+          console.log(componenteDeMasVentas)
+        }
+      });
+
+  const vendidos = (cuentaParcial, componente) => {
+     cuentaParcial[componente] = cuentaParcial[componente] + 1 || 1
+     return cuentaParcial
+   }
+
+
+    return nombreDelComponente.flat().reduce(vendidos, [])
+}
+// const componenteMasVendido = () => {
+//   let mayor = 0;
+//   let componenteDeMasVentas ="";
+//   precios.forEach(componente => {
+//     let numero = cantidadVentasComponente(componente[0]);
+//     if(mayor <= numero) {
+//       mayor = numero;
+//       mayor += componente[0];
+//       componenteDeMasVentas = mayor;
+//     }
+//   });
+//   return componenteDeMasVentas
+// }
+const ventasSucursal = (sucursal) => {
+  const filtrarPorSucursal = ventas.filter(venta => venta.includes(sucursal));
+  console.log(filtrarPorSucursal)
+
+  let porSucursal = [];
+    
+  for (let i = 0;  i < filtrarPorSucursal.length; i++) {
+      let obtenerComponentes = filtrarPorSucursal[i].splice(6);
+      console.log(obtenerComponentes)
+      porSucursal.push(obtenerComponentes.flat());  
+   }
+   return precioMaquina(porSucursal.flat());
+}
+
+// const componenteMasVendido = () => {
+//   let mayor = 0;
+//   let componenteDeMasVentas=[];
+//   precios.forEach(componente => {
+//     let numero = cantidadVentasComponente(componente[0]);
+//     // console.log(numero)
+//     if(numero >= mayor) {
+//       mayor = numero;
+//       console.log(numero)
+//       let resultado = componente[0];
+//       console.log(resultado)
+//       componenteDeMasVentas.push(resultado)
+//     }
+//   });
+//   return mayor
+// }
 
 
 const cantidadVentasComponente = componente => {
@@ -59,6 +143,9 @@ const cantidadVentasComponente = componente => {
   return totalVentas
 }
 
+
+
+
 const ventasVendedora = nombre => {
   const filtrarPorVendedora = ventas.filter(vendedora => vendedora.includes(nombre));
 
@@ -69,4 +156,33 @@ const ventasVendedora = nombre => {
     losComponentes.push(obtenerComponentes.flat()); 
    }
    return precioMaquina(losComponentes.flat()); // flat hace un único array y permite hacer la operación de ventas.
+} 
+
+
+const obtenerIdVenta = () => {
+  let maximo = 999999999;
+  let minimo = 100000000;
+  let idAleatorio = Math.random() * (maximo - minimo) + minimo;
+    
+  return Math.round(idAleatorio);
+}
+const agregarVenta = (dia, mes, anio, vendedora, sucursal, componentes) => {
+  let nuevaVenta = [];
+  
+  nuevaVenta.push(obtenerIdVenta(), dia, mes, anio, vendedora, sucursal, componentes);
+  ventas.push(nuevaVenta);
+
+  return nuevaVenta
+}
+
+const ventaPromedio = () => {
+  let porComponentes =[];
+
+  for (let i = 0;  i < ventas.length; i++) {
+    let obtenerComponentes = ventas[i].slice(6);
+    // console.log(obtenerComponentes)
+    porComponentes.push(obtenerComponentes.flat()); 
+   } 
+   const ventasTotales = precioMaquina(porComponentes.flat()) / ventas.length;
+   return Math.round(ventasTotales)
 } 
