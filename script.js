@@ -62,44 +62,22 @@ const mejorVendedora = () => {
 }
 
 const componenteMasVendido = () => {
-  let mayor = 0;
-  let nombreDelComponente = [];
+   let nombreDelComponente = [];
   for (let i = 0; i < ventas.length; i++) {
     let venta = ventas[i].slice(6).flat()
     nombreDelComponente.push(venta)  
   }
-
-  nombreDelComponente.forEach(componente => {
-        let numero = cantidadVentasComponente(componente);
-        if(mayor <= numero) {
-          mayor = numero;
-          mayor += componente;
-          componenteDeMasVentas = componente;
-          console.log(componenteDeMasVentas)
-        }
-      });
-
   const vendidos = (cuentaParcial, componente) => {
      cuentaParcial[componente] = cuentaParcial[componente] + 1 || 1
      return cuentaParcial
    }
-
-
-    return nombreDelComponente.flat().reduce(vendidos, [])
+  
+   const orden = nombreDelComponente.flat().reduce(vendidos, [])
+ 
+    // const resultado = orden.slice(0, 1)
+    // console.log(resultado)
 }
-// const componenteMasVendido = () => {
-//   let mayor = 0;
-//   let componenteDeMasVentas ="";
-//   precios.forEach(componente => {
-//     let numero = cantidadVentasComponente(componente[0]);
-//     if(mayor <= numero) {
-//       mayor = numero;
-//       mayor += componente[0];
-//       componenteDeMasVentas = mayor;
-//     }
-//   });
-//   return componenteDeMasVentas
-// }
+
 const ventasSucursal = (sucursal) => {
   const filtrarPorSucursal = ventas.filter(venta => venta.includes(sucursal));
   console.log(filtrarPorSucursal)
